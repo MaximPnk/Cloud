@@ -1,4 +1,4 @@
-package nio;
+package testNIO;
 
 import java.io.File;
 import java.io.IOException;
