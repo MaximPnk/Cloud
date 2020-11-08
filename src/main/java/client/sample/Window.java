@@ -18,6 +18,7 @@ public class Window extends Application {
         primaryStage.setMinWidth(300);
         primaryStage.setScene(new Scene(root, 700, 700));
         primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> Controller.closeConnection());
     }
 
 

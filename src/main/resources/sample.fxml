@@ -1,6 +1,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<!--<VBox fx:controller="client.sample.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center">
+<!--<VBox fx:controller="client.sample.AnotherController" xmlns:fx="http://javafx.com/fxml" alignment="center">
     <HBox fx:id="logPassBox">
         <TextField fx:id="loginArea" minHeight="30" minWidth="100" HBox.hgrow="ALWAYS" onAction="#loginAction" />
         <TextField fx:id="passwordArea" minHeight="30" minWidth="100" HBox.hgrow="ALWAYS" onAction="#loginAction" />
@@ -12,7 +12,7 @@
         <Button fx:id="sendButton" minHeight="30" minWidth="100" text="Send" onAction="#clickAction"/>
     </HBox>
 </VBox>-->
-<VBox fx:controller="client.sample.MyController" xmlns:fx="http://javafx.com/fxml" alignment="center">
+<VBox fx:controller="client.sample.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center">
     <HBox>
         <TextArea HBox.hgrow="ALWAYS" fx:id="clientArea" editable="false" />
         <TextArea HBox.hgrow="ALWAYS" fx:id="serverArea" editable="false" />

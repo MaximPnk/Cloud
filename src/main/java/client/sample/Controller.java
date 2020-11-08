@@ -1,163 +1,142 @@
 package client.sample;
 
-import javafx.application.Platform;
+import client.service.ClientCommands;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-
 
 public class Controller {
 
     @FXML
-    TextArea mainTextArea;
+    TextArea textArea;
 
     @FXML
-    TextField messageArea;
+    TextField textField;
 
     @FXML
     Button sendButton;
 
     @FXML
-    TextField loginArea;
+    TextArea serverArea;
 
     @FXML
-    TextField passwordArea;
+    TextArea clientArea;
 
-    @FXML
-    Button loginButton;
+    private boolean worksWithServer = true;
+    private static Socket socket = null;
+    private static DataInputStream dis = null;
+    private static DataOutputStream dos = null;
+    private final ClientCommands clientCommands = new ClientCommands();
+    private static boolean isConnected = true;
 
-    @FXML
-    HBox logPassBox;
+    public void initialize() {
 
-    @FXML
-    HBox chatBox;
-
-    private Socket socket;
-    private DataInputStream dis;
-    private DataOutputStream dos;
-    private boolean isClosed;
-    private ArrayList<String> history;
-
-    public void clickAction(ActionEvent actionEvent) {
-        if (!messageArea.getText().trim().isEmpty()) {
-            if (socket == null || socket.isClosed()) {
-                clientService();
-            }
-            try {
-                dos.writeUTF(messageArea.getText());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            messageArea.clear();
-        }
-    }
-
-    public void loginAction(ActionEvent actionEvent) {
-        if (!loginArea.getText().trim().isEmpty() && !passwordArea.getText().trim().isEmpty()) {
-            if (socket == null || socket.isClosed()) {
-                clientService();
-            }
-            try {
-                dos.writeUTF(String.format("/auth %s %s", loginArea.getText(), passwordArea.getText()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        loginArea.clear();
-        passwordArea.clear();
-    }
-
-    public void clientService() {
+        serverArea.setStyle("-fx-border-color: FF0000");
 
         try {
-            isClosed = false;
             socket = new Socket("localhost", 8189);
             dis = new DataInputStream(socket.getInputStream());
             dos = new DataOutputStream(socket.getOutputStream());
-            setAuth(false);
-            Thread t1 = new Thread(() -> {
-                try {
-                    while (!isClosed) {
-                        if (dis.available() > 0) {
-                            String strMsg = dis.readUTF();
-                            if (strMsg.startsWith("/authOk")) {
-                                setAuth(true);
-                                history = new ArrayList<>();
-                                try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/History.txt"))) {
-                                    while (reader.ready()) {
-                                        history.add(reader.readLine());
-                                    }
-                                }
-                                if (history.size() > 100) {
-                                    Platform.runLater(() -> mainTextArea.setText(String.join("\n", history.subList(history.size()-100, history.size()-1)) + "\n\n" + "End of history" + "\n\n"));
-                                } else {
-                                    Platform.runLater(() -> mainTextArea.setText(String.join("\n", history) + "\n\n" + "End of history" + "\n\n"));
-                                }
-                                mainTextArea.setScrollTop(Double.MIN_VALUE);
-                                break;
-                            } else if (strMsg.equals("/disconnect")) {
-                                closeConnection();
-                                return;
-                            }
-                            mainTextArea.appendText(strMsg + "\n");
-                        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        getFiles();
+
+        Thread reading = new Thread(() -> {
+            StringBuilder sb = new StringBuilder();
+            try {
+                while (isConnected) {
+                    while (dis.available() > 0) {
+                        sb.append((char) dis.read());
                     }
-                    while (!isClosed) {
-                        String strMsg = dis.readUTF();
-                        if (strMsg.equals("/exit")) {
-                            break;
+                    if (sb.length() > 0) {
+                        String answer = sb.toString();
+                        if (answer.contains("FILES START")) {
+                            serverArea.appendText(answer.replace(System.lineSeparator(), "|").replaceAll(".*FILES START", "")
+                                    .replaceAll("FILES END.*", "").replace("|", System.lineSeparator()));
+                            textArea.appendText(answer.replace(System.lineSeparator(), "|").replaceAll("FILES START.*FILES END", "")
+                                    .replace("|", System.lineSeparator()).replaceAll("^\\r\\n", ""));
+                        } else {
+                            textArea.appendText(answer.replaceAll("^\\r\\n", ""));
                         }
-                        mainTextArea.appendText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + " " + strMsg + "\n");
-                        try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/main/resources/History.txt", true))) {
-                            writer.write(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss")) + " " + strMsg + "\n");
-                        }
+                        sb = new StringBuilder();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            });
-            t1.setDaemon(true);
-            t1.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        reading.setDaemon(true);
+        reading.start();
+    }
+
+    public void clickAction(ActionEvent actionEvent) {
+
+        if (textField.getText().equals("swap")) {
+            worksWithServer = !worksWithServer;
+            if (worksWithServer) {
+                serverArea.setStyle("-fx-border-color: FF0000");
+                clientArea.setStyle("-fx-border-color: FFFFFF");
+            } else {
+                clientArea.setStyle("-fx-border-color: FF0000");
+                serverArea.setStyle("-fx-border-color: FFFFFF");
+            }
+        } else {
+            if (worksWithServer) {
+                if (!textField.getText().trim().isEmpty()) {
+                    if (socket == null || socket.isClosed()) {
+                        initialize();
+                    }
+                    try {
+                        dos.write(textField.getText().getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                if (!textField.getText().trim().isEmpty()) {
+                    String command = textField.getText();
+                    textArea.appendText(clientCommands.getAnswer(command) + System.lineSeparator());
+                }
+            }
+            getFiles();
+        }
+        textField.clear();
+    }
+
+    private void getFiles() {
+        clientArea.clear();
+        serverArea.clear();
+
+        clientArea.appendText(clientCommands.getAnswer("getfiles"));
+        try {
+            dos.write("getfiles".getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void setAuth(boolean b) {
-        if (b) {
-            logPassBox.setVisible(false);
-            chatBox.setVisible(true);
-        } else {
-            logPassBox.setVisible(true);
-            chatBox.setVisible(false);
-        }
-    }
-
-    private void closeConnection() {
-        isClosed = true;
+    public static void closeConnection() {
+        isConnected = false;
 
         try {
             dis.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         try {
             dos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         try {
             socket.close();
         } catch (IOException e) {

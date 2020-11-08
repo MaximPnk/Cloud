@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-public class Commands {
+public class ClientCommands {
 
     private String rootPath = "Client";
 
@@ -45,14 +45,8 @@ public class Commands {
             return copyFile(command.split(" ")[1], command.split(" ")[2]) ?
                     "Copy successfully completed" :
                     "Directory doesn't exists or something went wrong";
-        } else if (command.matches("^upload [\\w]+\\.[a-zA-Z]+$")) {
-            return "UPLOAD";
-            //TODO add upload logic after creating client
-        } else if (command.matches("^download [\\w]+\\.[a-zA-Z]+$")) {
-            return "DOWNLOAD";
-            //TODO add download logic after creating client
         } else if (command.equals("getfiles")) {
-            return String.join(System.lineSeparator(), Objects.requireNonNull(new File(rootPath).list()));
+            return "Path: " + rootPath + System.lineSeparator() + String.join(System.lineSeparator(), Objects.requireNonNull(new File(rootPath).list()));
         } else {
             return "Enter \"--help\" for help";
         }

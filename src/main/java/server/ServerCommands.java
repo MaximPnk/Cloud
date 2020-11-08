@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-public class Commands {
+public class ServerCommands {
 
     private String rootPath = "Server";
 
@@ -52,14 +52,18 @@ public class Commands {
             return "DOWNLOAD";
             //TODO add download logic after creating client
         } else if (command.equals("getfiles")) {
-            return String.join(System.lineSeparator(), Objects.requireNonNull(new File(rootPath).list()));
+            return "FILES START" +
+                    "Path: " + rootPath + System.lineSeparator() + String.join(System.lineSeparator(), Objects.requireNonNull(new File(rootPath).list())) +
+                    "FILES END";
         } else {
             return "Enter \"--help\" for help";
         }
     }
 
     private boolean copyFile(String fileName, String dst) {
-        if (dst.contains("/") && !new File(dst.substring(0, dst.lastIndexOf("/"))).exists()) {
+        if (dst.contains("/") && !new File("Server/" + dst.substring(0, dst.lastIndexOf("/"))).exists()) {
+            System.out.println(dst);
+            System.out.println(dst.substring(0, dst.lastIndexOf("/")));
             return false;
         } else {
             try {
