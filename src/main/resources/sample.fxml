@@ -1,21 +1,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<!--<VBox fx:controller="client.sample.AnotherController" xmlns:fx="http://javafx.com/fxml" alignment="center">
-    <HBox fx:id="logPassBox">
-        <TextField fx:id="loginArea" minHeight="30" minWidth="100" HBox.hgrow="ALWAYS" onAction="#loginAction" />
-        <TextField fx:id="passwordArea" minHeight="30" minWidth="100" HBox.hgrow="ALWAYS" onAction="#loginAction" />
-        <Button fx:id="loginButton" minHeight="30" minWidth="100" text="Auth" HBox.hgrow="ALWAYS" onAction="#loginAction"/>
-    </HBox>
-    <TextArea fx:id="mainTextArea" VBox.vgrow="ALWAYS" editable="false"/>
-    <HBox visible="false" fx:id="chatBox">
-        <TextField fx:id="messageArea" minHeight="30" HBox.hgrow="ALWAYS" onAction="#clickAction"/>
-        <Button fx:id="sendButton" minHeight="30" minWidth="100" text="Send" onAction="#clickAction"/>
-    </HBox>
-</VBox>-->
+
 <VBox fx:controller="client.sample.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center">
-    <HBox>
-        <TextArea HBox.hgrow="ALWAYS" fx:id="clientArea" editable="false" />
-        <TextArea HBox.hgrow="ALWAYS" fx:id="serverArea" editable="false" />
+    <HBox minHeight="300">
+        <VBox fx:id="clientSide" HBox.hgrow="ALWAYS">
+            <TextField fx:id="clientPath" editable="false" />
+            <ListView fx:id="clientView" />
+        </VBox>
+        <VBox fx:id="serverSide" HBox.hgrow="ALWAYS">
+            <TextField fx:id="serverPath" editable="false" />
+            <ListView fx:id="serverView" />
+        </VBox>
     </HBox>
     <TextArea VBox.vgrow="ALWAYS" fx:id="textArea" editable="false" />
     <HBox minHeight="30">

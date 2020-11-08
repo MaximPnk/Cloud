@@ -2,6 +2,7 @@ package server;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import server.service.ServerCommands;
 
 public class MessageHandler extends SimpleChannelInboundHandler<String> {
 

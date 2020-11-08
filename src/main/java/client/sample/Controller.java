@@ -1,11 +1,15 @@
 package client.sample;
 
 import client.service.ClientCommands;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,10 +28,22 @@ public class Controller {
     Button sendButton;
 
     @FXML
-    TextArea serverArea;
+    TextField clientPath;
 
     @FXML
-    TextArea clientArea;
+    ListView<String> clientView;
+
+    @FXML
+    TextField serverPath;
+
+    @FXML
+    ListView<String> serverView;
+
+    @FXML
+    VBox clientSide;
+
+    @FXML
+    VBox serverSide;
 
     private boolean worksWithServer = true;
     private static Socket socket = null;
@@ -38,7 +54,9 @@ public class Controller {
 
     public void initialize() {
 
-        serverArea.setStyle("-fx-border-color: FF0000");
+        setActions();
+
+        serverSide.setStyle("-fx-border-color: FF0000");
 
         try {
             socket = new Socket("localhost", 8189);
@@ -60,8 +78,11 @@ public class Controller {
                     if (sb.length() > 0) {
                         String answer = sb.toString();
                         if (answer.contains("FILES START")) {
-                            serverArea.appendText(answer.replace(System.lineSeparator(), "|").replaceAll(".*FILES START", "")
-                                    .replaceAll("FILES END.*", "").replace("|", System.lineSeparator()));
+                            String[] files = answer.replace(System.lineSeparator(), "|").replaceAll(".*FILES START", "")
+                                    .replaceAll("FILES END.*", "").replace("|", System.lineSeparator()).split(" ");
+                            serverPath.setText(files[0]);
+                            files[0] = "..";
+                            Platform.runLater(() -> serverView.setItems(FXCollections.observableArrayList(files)));
                             textArea.appendText(answer.replace(System.lineSeparator(), "|").replaceAll("FILES START.*FILES END", "")
                                     .replace("|", System.lineSeparator()).replaceAll("^\\r\\n", ""));
                         } else {
@@ -78,16 +99,35 @@ public class Controller {
         reading.start();
     }
 
+    private void setActions() {
+        clientView.setOnMouseClicked(click -> {
+            if (click.getClickCount() == 2 && !clientView.getSelectionModel().getSelectedItem().matches("[\\w]\\.[\\w]")) {
+                clientCommands.getAnswer("cd " + clientView.getSelectionModel().getSelectedItem());
+                getFiles();
+            }
+        });
+        serverView.setOnMouseClicked(click -> {
+            if (click.getClickCount() == 2 && !serverView.getSelectionModel().getSelectedItem().matches("[\\w]\\.[\\w]")) {
+                try {
+                    dos.write(("cd " + serverView.getSelectionModel().getSelectedItem()).getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                getFiles();
+            }
+        });
+    }
+
     public void clickAction(ActionEvent actionEvent) {
 
         if (textField.getText().equals("swap")) {
             worksWithServer = !worksWithServer;
             if (worksWithServer) {
-                serverArea.setStyle("-fx-border-color: FF0000");
-                clientArea.setStyle("-fx-border-color: FFFFFF");
+                serverSide.setStyle("-fx-border-color: FF0000");
+                clientSide.setStyle("-fx-border-color: FFFFFF");
             } else {
-                clientArea.setStyle("-fx-border-color: FF0000");
-                serverArea.setStyle("-fx-border-color: FFFFFF");
+                clientSide.setStyle("-fx-border-color: FF0000");
+                serverSide.setStyle("-fx-border-color: FFFFFF");
             }
         } else {
             if (worksWithServer) {
@@ -113,10 +153,10 @@ public class Controller {
     }
 
     private void getFiles() {
-        clientArea.clear();
-        serverArea.clear();
-
-        clientArea.appendText(clientCommands.getAnswer("getfiles"));
+        String[] files = clientCommands.getAnswer("getfiles").split(" ");
+        clientPath.setText(files[0]);
+        files[0] = "..";
+        clientView.setItems(FXCollections.observableArrayList(files));
         try {
             dos.write("getfiles".getBytes());
         } catch (IOException e) {

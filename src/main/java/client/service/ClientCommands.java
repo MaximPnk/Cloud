@@ -13,17 +13,13 @@ public class ClientCommands {
     public String getAnswer(String command) {
         if (command.equals("--help")) {
             return "---------------------------------------------------------------------" + System.lineSeparator() +
-                    "ls - for show list of dirs/files" + System.lineSeparator() +
+                    "swap - change client/server side to work with" +
                     "cd - for change directory" + System.lineSeparator() +
                     "touch - create file" + System.lineSeparator() +
                     "mkdir - create directory" + System.lineSeparator() +
                     "rm - delete directory or file" + System.lineSeparator() +
                     "cat - read file" + System.lineSeparator() +
-                    "copy - copy [filename.txt] [your/path/new_name.txt] - args in []" + System.lineSeparator() +
-                    "---------------------------------------------------------------------";
-        } else if (command.equals("ls")) {
-            return "---------------------------------------------------------------------" + System.lineSeparator() +
-                    getFilesList() + System.lineSeparator() +
+                    "copy - copy filename.txt your/path/from/root/new_name.txt" + System.lineSeparator() +
                     "---------------------------------------------------------------------";
         } else if (command.matches("^cd .*$") && command.split(" ").length == 2) {
             return changeRootPath(command);
@@ -46,14 +42,14 @@ public class ClientCommands {
                     "Copy successfully completed" :
                     "Directory doesn't exists or something went wrong";
         } else if (command.equals("getfiles")) {
-            return "Path: " + rootPath + System.lineSeparator() + String.join(System.lineSeparator(), Objects.requireNonNull(new File(rootPath).list()));
+            return rootPath + " " + String.join(" ", Objects.requireNonNull(new File(rootPath).list()));
         } else {
             return "Enter \"--help\" for help";
         }
     }
 
     private boolean copyFile(String fileName, String dst) {
-        if (dst.contains("/") && !new File(dst.substring(0, dst.lastIndexOf("/"))).exists()) {
+        if (dst.contains("/") && !new File("Client/" + dst.substring(0, dst.lastIndexOf("/"))).exists()) {
             return false;
         } else {
             try {
