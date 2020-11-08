@@ -1,6 +1,6 @@
 package client;
 
-import client.sample.Window;
+import client.graphics.Window;
 
 public class ClientApp {
     public static void main(String[] args) {

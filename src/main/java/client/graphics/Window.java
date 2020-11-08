@@ -1,4 +1,4 @@
-package client.sample;
+package client.graphics;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +12,7 @@ public class Window extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("sample.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("ClientWindow.fxml")));
         primaryStage.setTitle("File Commander");
         primaryStage.setMinHeight(200);
         primaryStage.setMinWidth(300);

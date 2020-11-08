@@ -1,20 +1,25 @@
-package client.sample;
+package client.graphics;
 
 import client.service.ClientCommands;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Objects;
 
 public class Controller {
 
@@ -44,6 +49,21 @@ public class Controller {
 
     @FXML
     VBox serverSide;
+
+    @FXML
+    Button mkdir;
+
+    @FXML
+    Button touch;
+
+    @FXML
+    Button remove;
+
+    @FXML
+    Button upload;
+
+    @FXML
+    Button download;
 
     private boolean worksWithServer = true;
     private static Socket socket = null;
@@ -100,14 +120,15 @@ public class Controller {
     }
 
     private void setActions() {
+
         clientView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2 && !clientView.getSelectionModel().getSelectedItem().matches("[\\w]\\.[\\w]")) {
+            if (click.getClickCount() == 2) {
                 clientCommands.getAnswer("cd " + clientView.getSelectionModel().getSelectedItem());
                 getFiles();
             }
         });
         serverView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2 && !serverView.getSelectionModel().getSelectedItem().matches("[\\w]\\.[\\w]")) {
+            if (click.getClickCount() == 2) {
                 try {
                     dos.write(("cd " + serverView.getSelectionModel().getSelectedItem()).getBytes());
                 } catch (IOException e) {
@@ -115,6 +136,36 @@ public class Controller {
                 }
                 getFiles();
             }
+        });
+        //TODO сделать вылетающее окно для названия
+        mkdir.setOnAction(click -> {
+            try {
+                dos.write(("mkdir " ).getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        touch.setOnAction(click -> {
+            try {
+                dos.write(("touch " ).getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        remove.setOnAction(click -> {
+            try {
+                dos.write(("rm " + serverView.getSelectionModel().getSelectedItem()).getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            getFiles();
+        });
+        upload.setOnAction(click -> {
+            //TODO upload file
+            new SubController().initialize();
+        });
+        download.setOnAction(click -> {
+            //TODO download file
         });
     }
 
