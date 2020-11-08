@@ -1,4 +1,4 @@
-package server;
+package client.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class Commands {
 
-    private String rootPath = "Server";
+    private String rootPath = "Client";
 
     public String getAnswer(String command) {
         if (command.equals("--help")) {
@@ -22,9 +22,9 @@ public class Commands {
                     "copy - copy [filename.txt] [your/path/new_name.txt] - args in []" + System.lineSeparator() +
                     "---------------------------------------------------------------------";
         } else if (command.equals("ls")) {
-        return "---------------------------------------------------------------------" + System.lineSeparator() +
-                getFilesList() + System.lineSeparator() +
-                "---------------------------------------------------------------------";
+            return "---------------------------------------------------------------------" + System.lineSeparator() +
+                    getFilesList() + System.lineSeparator() +
+                    "---------------------------------------------------------------------";
         } else if (command.matches("^cd .*$") && command.split(" ").length == 2) {
             return changeRootPath(command);
         } else if (command.matches("^touch [\\w]+\\.[a-zA-Z]+$")) {
@@ -63,7 +63,7 @@ public class Commands {
             return false;
         } else {
             try {
-                Files.copy(Paths.get(rootPath + "/" + fileName), Paths.get("Server/" + dst));
+                Files.copy(Paths.get(rootPath + "/" + fileName), Paths.get("Client/" + dst));
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -111,7 +111,7 @@ public class Commands {
         String[] path = command.split(" ")[1].split("/");
 
         for (String s : path) {
-            if (s.equals("..") && !tmpPath.equalsIgnoreCase("Server")) {
+            if (s.equals("..") && !tmpPath.equalsIgnoreCase("Client")) {
                 tmpPath = tmpPath.substring(0, tmpPath.lastIndexOf("/"));
             } else if (s.equals("..") || s.matches(".*[^\\w].*")) {
                 return "Invalid destination path";
