@@ -135,4 +135,8 @@ public class ServerCommands {
             return "";
         }
     }
+
+    public String getRootPath() {
+        return rootPath;
+    }
 }

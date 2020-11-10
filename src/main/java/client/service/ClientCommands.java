@@ -125,4 +125,8 @@ public class ClientCommands {
             return "";
         }
     }
+
+    public String getRootPath() {
+        return rootPath;
+    }
 }

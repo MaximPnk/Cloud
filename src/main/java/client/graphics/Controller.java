@@ -5,21 +5,12 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-import java.util.Objects;
+import java.util.Optional;
 
 public class Controller {
 
@@ -120,7 +111,6 @@ public class Controller {
     }
 
     private void setActions() {
-
         clientView.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2) {
                 clientCommands.getAnswer("cd " + clientView.getSelectionModel().getSelectedItem());
@@ -139,18 +129,34 @@ public class Controller {
         });
         //TODO сделать вылетающее окно для названия
         mkdir.setOnAction(click -> {
-            try {
-                dos.write(("mkdir " ).getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Some title");
+            dialog.setHeaderText("Enter directory name:");
+            dialog.getDialogPane().setHeader(null);
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(s -> {
+                try {
+                    dos.write(("mkdir " + s).getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            getFiles();
         });
         touch.setOnAction(click -> {
-            try {
-                dos.write(("touch " ).getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Some title");
+            dialog.setHeaderText("Enter file name:");
+            dialog.getDialogPane().setHeader(null);
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(s -> {
+                try {
+                    dos.write(("touch " + s).getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            getFiles();
         });
         remove.setOnAction(click -> {
             try {
@@ -162,11 +168,25 @@ public class Controller {
         });
         upload.setOnAction(click -> {
             //TODO upload file
-            new SubController().initialize();
+            uploadFile(clientView.getSelectionModel().getSelectedItem());
         });
         download.setOnAction(click -> {
             //TODO download file
         });
+    }
+
+    private void uploadFile(String selectedItem) {
+        try {
+            dos.write(("upload " + selectedItem).getBytes());
+            dos.write((" FILE START").getBytes());
+            FileInputStream fis = new FileInputStream(new File(clientCommands.getRootPath() + "/" + selectedItem));
+            while (fis.available() > 0) {
+                dos.write(fis.read());
+            }
+            dos.write((" FILE END").getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void clickAction(ActionEvent actionEvent) {
