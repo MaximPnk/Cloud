@@ -21,7 +21,7 @@ public class NettyServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<Channel>() {
                         @Override
-                        protected void initChannel(Channel channel) throws Exception {
+                        protected void initChannel(Channel channel) {
                             channel.pipeline()
                                     .addLast(new StringDecoder(), new StringEncoder(), new MessageHandler());
                         }
