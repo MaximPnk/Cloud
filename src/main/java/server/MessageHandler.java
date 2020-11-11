@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class MessageHandler extends SimpleChannelInboundHandler<String> {
+public class MessageHandler extends SimpleChannelInboundHandler<Object> {
 
     private final ServerCommands serverCommands = new ServerCommands();
     private boolean uploading;
@@ -17,18 +17,20 @@ public class MessageHandler extends SimpleChannelInboundHandler<String> {
     private FileOutputStream fos;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) {
         if (!uploading) {
-            String command = s.replace(System.lineSeparator(), "");
+
+            String command = ((String) o).replace(System.lineSeparator(), "");
+
             if (!command.equals("getfiles")) {
                 System.out.println("Message from client: " + command);
             }
-            if (command.matches("^upload [\\w]+\\.[a-zA-Z]+.*")) {
+
+            if (command.matches("^upload [\\w]+\\.[a-zA-Z]+")) {
                 uploading = true;
                 serverCommands.getAnswer("rm " + command.split(" ")[1]);
                 serverCommands.getAnswer("touch " + command.split(" ")[1]);
                 filename = command.split(" ")[1];
-                channelRead0(channelHandlerContext, command.replaceAll("upload [\\w]+\\.[a-zA-Z]+", ""));
                 try {
                     fos = new FileOutputStream(new File(serverCommands.getRootPath() + "/" + filename), true);
                 } catch (FileNotFoundException e) {
@@ -39,15 +41,12 @@ public class MessageHandler extends SimpleChannelInboundHandler<String> {
             }
         } else {
             try {
-                if (s.replace(System.lineSeparator(), "|").matches(".*FILE START.*")) {
-                    fos = new FileOutputStream(new File(serverCommands.getRootPath() + "/" + filename), true);
-                    fos.write(s.replaceAll(".*FILE START", "").getBytes());
-                } else if (s.replace(System.lineSeparator(), "|").matches(".*FILE END.*")) {
-                    fos.write(s.replace(System.lineSeparator(), "|").replaceAll("[\\s]FILE END.*", "").replace("|", System.lineSeparator()).getBytes());
+                if (((String) o).replace(System.lineSeparator(), "").matches(".*END OF FILE.*")) {
+                    fos.write(((String) o).replace(System.lineSeparator(), "|").replaceAll("END OF FILE.*", "").replace("|", System.lineSeparator()).getBytes());
                     uploading = false;
                     fos.close();
                 } else {
-                    fos.write(s.getBytes());
+                    fos.write((int) o);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

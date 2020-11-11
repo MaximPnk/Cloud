@@ -8,8 +8,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class Controller {
@@ -178,12 +183,11 @@ public class Controller {
     private void uploadFile(String selectedItem) {
         try {
             dos.write(("upload " + selectedItem).getBytes());
-            dos.write((" FILE START").getBytes());
-            FileInputStream fis = new FileInputStream(new File(clientCommands.getRootPath() + "/" + selectedItem));
-            while (fis.available() > 0) {
-                dos.write(fis.read());
+            FileInputStream fos = new FileInputStream(new File(clientCommands.getRootPath() + "/" + selectedItem));
+            while (fos.available() > 0) {
+                dos.write(fos.read());
             }
-            dos.write((" FILE END").getBytes());
+            dos.write(("END OF FILE").getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
