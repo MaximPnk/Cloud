@@ -1,7 +1,7 @@
 package service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
 
 public class ServerCommands {
 
@@ -42,6 +42,22 @@ public class ServerCommands {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public void upload(byte[] msg) {
+        try {
+            String fileName = Convert.bytesToStr(Arrays.copyOfRange(msg, 1, msg[0] + 1));
+            File file = new File(rootPath + "/" + fileName);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            DataOutputStream uploadDos = new DataOutputStream(new FileOutputStream(file, true));
+            uploadDos.write(Arrays.copyOfRange(msg, msg[0] + 1, msg.length));
+
+            uploadDos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getRootPath() {

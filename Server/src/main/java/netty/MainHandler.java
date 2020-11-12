@@ -18,8 +18,14 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         buffer = (ByteBuf) msg;
+        System.out.println(buffer);
 
         try {
+            /*if (needToReadMore) {
+                endOfWriting(ctx);
+            } else {
+                messageHandler(ctx);
+            }*/
             messageHandler(ctx);
         } finally {
             buffer.release();
@@ -27,7 +33,30 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void messageHandler(ChannelHandlerContext ctx) {
-        int length = buffer.readByte();
+
+        int lengthOfLengthInBytes = buffer.readByte();
+        byte[] lengthInBytes = new byte[lengthOfLengthInBytes];
+        for (int i = 0; i < lengthOfLengthInBytes; i++) {
+            lengthInBytes[i] = buffer.readByte();
+        }
+
+        System.out.println("Length of length = " + lengthOfLengthInBytes);
+        int lengthOfMsg = Convert.bytesToInt(lengthInBytes);
+        System.out.println("Length of message = " + lengthOfMsg);
+        byte command = buffer.readByte();
+        System.out.println("Byte of command = " + command);
+        System.out.println(buffer.readableBytes());
+        byte[] msg = new byte[lengthOfMsg - 1];
+        System.out.println(msg.length);
+        buffer.readBytes(msg);
+        operationHandler(ctx, msg, command);
+
+        if (buffer.readableBytes() > 0) {
+            buffer.retain();
+            channelRead(ctx, buffer);
+        }
+
+        /*int length = buffer.readByte();
         byte command = buffer.readByte();
         byte[] msg = new byte[length - 1];
         buffer.readBytes(msg);
@@ -35,16 +64,31 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
         if (buffer.readableBytes() > 0) {
             buffer.retain();
             channelRead(ctx, buffer);
-        }
+        }*/
     }
 
+    /*private void endOfWriting(ChannelHandlerContext ctx) {
+        for (int i = bytes.length - howMuchRead; i < howMuchRead; i++) {
+            bytes[i] = buffer.readByte();
+        }
+
+        if (buffer.readableBytes() > 0) {
+            buffer.retain();
+            channelRead(ctx, buffer);
+        } else {
+            needToReadMore = false;
+            operationHandler(ctx, bytes, command);
+        }
+    }*/
+
     private void operationHandler(ChannelHandlerContext ctx, byte[] msg, byte command) {
-        System.out.printf("%s [%d] : %s\r\n", Commands.getCommand(command).toString(), command, Arrays.toString(msg));
-        System.out.println(serverCommands.getRootPath());
+//        System.out.printf("%s [%d] : %s\r\n", Commands.getCommand(command).toString(), command, Arrays.toString(msg));
+//        System.out.println(serverCommands.getRootPath());
         switch (Commands.getCommand(command)) {
             case DOWNLOAD:
                 break;
             case UPLOAD:
+                serverCommands.upload(msg);
                 break;
             case MKDIR:
                 sendMsg(ctx, ((char) Commands.MKDIR.getBt() + "Creating directory " + (serverCommands.mkdir(Convert.bytesToStr(msg)) ? "success" : "failed")).getBytes());
@@ -66,7 +110,7 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void sendMsg(ChannelHandlerContext ctx, byte[] msg) {
-        if (msg.length > 255) {
+        if (msg.length > 2048) {
             System.out.println("TOO MUCH BYTES, FIX IT");
         } else {
             ctx.writeAndFlush(new byte[]{(byte) (msg.length - 1)});

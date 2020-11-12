@@ -10,11 +10,11 @@ import operations.ClientLog;
 import operations.GetFiles;
 import operations.Help;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -139,6 +139,13 @@ public class Controller implements Initializable {
 
     private void setClickActions() {
         Help.help();
+
+        upload.setOnAction(click -> {
+            if (clientView.getSelectionModel().getSelectedItem() != null && clientView.getSelectionModel().getSelectedItem().contains(".")) {
+                uploadFile(clientView.getSelectionModel().getSelectedItem());
+            }
+        });
+
         mkdir.setOnAction(click -> {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Create new directory");
@@ -154,6 +161,7 @@ public class Controller implements Initializable {
             });
             get.fire();
         });
+
         touch.setOnAction(click -> {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Make new file");
@@ -169,21 +177,25 @@ public class Controller implements Initializable {
             });
             get.fire();
         });
+
         remove.setOnAction(click -> {
             if (serverView.getSelectionModel().getSelectedItem() != null) {
                 sendMsg(((char) Commands.REMOVE.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
             }
             get.fire();
         });
+
         get.setOnAction(click -> {
             sendMsg(Commands.GET.getBt());
         });
+
         clientView.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2 && clientView.getSelectionModel().getSelectedItem() != null) {
                 ChangeDirectory.change(clientView.getSelectionModel().getSelectedItem());
                 GetFiles.clientFiles();
             }
         });
+
         serverView.setOnMouseClicked(click -> {
             if (click.getClickCount() == 2 && serverView.getSelectionModel().getSelectedItem() != null) {
                 sendMsg(((char) Commands.CD.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
@@ -192,26 +204,59 @@ public class Controller implements Initializable {
         });
     }
 
-    private void sendMsg(byte[] msg) {
+    private void uploadFile(String selectedItem) {
         try {
-            if (msg.length > 255) {
-                logArea.appendText("TOO MUCH BYTES, NEED TO FIX IT");
-            } else {
-                dos.write(msg.length);
-                dos.write(msg);
+
+            File file = new File(ChangeDirectory.getRootPath() + "/" + selectedItem);
+            DataInputStream uploadDis = new DataInputStream(new FileInputStream(file));
+            byte[] data = new byte[(int) file.length()];
+            int size = uploadDis.read(data);
+            byte[] send = new byte[9900];
+            send[0] = Commands.UPLOAD.getBt();
+            send[1] = (byte) selectedItem.length();
+            System.arraycopy(selectedItem.getBytes(), 0, send, 2, selectedItem.getBytes().length);
+            int start = 2 + selectedItem.getBytes().length;
+            int freeSpace = 9900 - start;
+
+            File file1 = new File("Client/Storage/copy_" + selectedItem);
+            file1.createNewFile();
+            DataOutputStream dos = new DataOutputStream(new FileOutputStream(file1));
+
+            for (int i = 0; i + freeSpace - 1 < size; i += freeSpace) {
+                System.arraycopy(data, i, send, start, Math.min(freeSpace, size - i));
+//                sendMsg(send);
+                byte[] arr = new byte[send.length - start];
+                if (arr.length >= 0) System.arraycopy(send, start, arr, 0, arr.length);
+                dos.write(arr);
             }
+
+            uploadDis.close();
+            dos.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void sendMsg(byte msg) {
+    private void sendMsg(byte[] msg) {
         try {
-            dos.write(1);
-            dos.write(msg);
-        } catch (IOException e) {
+            System.out.println(msg.length);
+            byte[] msgLengthInBytes = BigInteger.valueOf(msg.length).toByteArray();
+            int lengthOfBytes = msgLengthInBytes.length;
+            byte[] data = new byte[1 + msgLengthInBytes.length + msg.length];
+            data[0] = (byte) lengthOfBytes;
+            System.arraycopy(msgLengthInBytes, 0, data, 1, msgLengthInBytes.length);
+            System.arraycopy(msg, 0, data, msgLengthInBytes.length + 1, msg.length);
+            System.out.println(Arrays.toString(data));
+            dos.write(data);
+            Thread.sleep(100);
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendMsg(byte msg) {
+        sendMsg(new byte[]{msg});
     }
 
     public static void closeConnection() {

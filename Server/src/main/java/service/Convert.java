@@ -9,4 +9,10 @@ public class Convert {
         }
         return sb.toString();
     }
+
+    public static int bytesToInt (byte[] bytes) {
+        int value = 0;
+        for (byte aByte : bytes) value = (value << 8) + (aByte & 0xFF);
+        return value;
+    }
 }
