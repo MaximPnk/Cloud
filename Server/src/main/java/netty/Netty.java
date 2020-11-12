@@ -7,10 +7,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.serialization.ObjectDecoder;
 
 public class Netty {
 
@@ -26,7 +23,7 @@ public class Netty {
                         protected void initChannel(SocketChannel channel) {
                             channel.pipeline()
                                     .addLast(new ByteArrayEncoder(),
-                                            new InputHandler());
+                                            new MainHandler());
                         }
                     });
             ChannelFuture future = bootstrap.bind(8189).sync();

@@ -10,9 +10,11 @@ public class GetFiles {
 
     public static void serverFiles(String list) {
         String[] files = list.split(" ");
-        Window.getController().serverPath.setText(files[0]);
-        files[0] = "..";
-        Window.getController().serverView.setItems(FXCollections.observableArrayList(files));
+        Platform.runLater(() -> {
+            Window.getController().serverPath.setText(files[0]);
+            files[0] = "..";
+            Window.getController().serverView.setItems(FXCollections.observableArrayList(files));
+        });
     }
 
     public static void clientFiles() {

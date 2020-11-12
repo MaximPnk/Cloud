@@ -7,7 +7,8 @@ public enum Commands {
     TOUCH ((byte) 40),
     REMOVE ((byte) 50),
     GET((byte) 60),
-    CD ((byte) 70);
+    CD ((byte) 70),
+    LOG ((byte) 80);
 
     private final byte bt;
 
@@ -28,8 +29,10 @@ public enum Commands {
             return REMOVE;
         } else if (bt == GET.bt) {
             return GET;
-        } else {
+        } else if (bt == CD.bt) {
             return CD;
+        } else {
+            return LOG;
         }
     }
 

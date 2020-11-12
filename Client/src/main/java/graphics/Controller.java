@@ -3,19 +3,19 @@ package graphics;
 import commands.Commands;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import operations.ChangeDirectory;
+import operations.ClientLog;
 import operations.GetFiles;
+import operations.Help;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -59,6 +59,9 @@ public class Controller implements Initializable {
     @FXML
     public TextArea logArea;
 
+    @FXML
+    public Button help;
+
     private static Socket socket = null;
     private static DataInputStream dis = null;
     private static DataOutputStream dos = null;
@@ -82,13 +85,15 @@ public class Controller implements Initializable {
 
     private void readMsg() {
         StringBuilder sb = new StringBuilder();
+        int length;
         byte command = -1;
 
         try {
-            while (dis.available() > 0) {
+            if (dis.available() > 0) {
+                length = dis.readByte();
                 command = dis.readByte();
 
-                while (dis.available() > 0) {
+                for (int i = 0; i < length; i++) {
                     sb.append((char) dis.readByte());
                 }
             }
@@ -97,12 +102,11 @@ public class Controller implements Initializable {
         }
 
         if (sb.length() > 0) {
-            handleCommand(command, sb);
-            sb = new StringBuilder();
+            handleCommand(command, sb.toString());
         }
     }
 
-    private void handleCommand(byte command, StringBuilder sb) {
+    private void handleCommand(byte command, String input) {
 
         switch (Commands.getCommand(command)) {
             case DOWNLOAD:
@@ -110,14 +114,14 @@ public class Controller implements Initializable {
             case UPLOAD:
                 break;
             case MKDIR:
-                break;
             case TOUCH:
-                break;
             case REMOVE:
+            case LOG:
+                ClientLog.log(input);
                 break;
             case GET:
                 GetFiles.clientFiles();
-                GetFiles.serverFiles(sb.toString());
+                GetFiles.serverFiles(input);
                 break;
         }
     }
@@ -134,37 +138,80 @@ public class Controller implements Initializable {
     }
 
     private void setClickActions() {
+        Help.help();
         mkdir.setOnAction(click -> {
-            try {
-                dos.write(Commands.MKDIR.getBt());
-                dos.write("some text".getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        get.setOnAction(click -> {
-            try {
-                dos.write(Commands.GET.getBt());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        clientView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2) {
-                ChangeDirectory.change(clientView.getSelectionModel().getSelectedItem());
-                get.fire();
-            }
-        });
-        serverView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2) {
-                try {
-                    dos.write(((char) Commands.CD.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Create new directory");
+            dialog.setHeaderText("Enter directory name");
+            dialog.getDialogPane().setHeader(null);
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(name -> {
+                if (name.matches("^[\\w]+$")) {
+                    sendMsg(((char) Commands.MKDIR.getBt() + name).getBytes());
+                } else {
+                    logArea.appendText("Invalid directory name" + System.lineSeparator());
                 }
+            });
+            get.fire();
+        });
+        touch.setOnAction(click -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Make new file");
+            dialog.setHeaderText("Enter file name");
+            dialog.getDialogPane().setHeader(null);
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(name -> {
+                if (name.matches("^[\\w]+\\.[a-zA-Z]+$")) {
+                    sendMsg(((char) Commands.TOUCH.getBt() + name).getBytes());
+                } else {
+                    logArea.appendText("Invalid file name" + System.lineSeparator());
+                }
+            });
+            get.fire();
+        });
+        remove.setOnAction(click -> {
+            if (serverView.getSelectionModel().getSelectedItem() != null) {
+                sendMsg(((char) Commands.REMOVE.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
             }
             get.fire();
         });
+        get.setOnAction(click -> {
+            sendMsg(Commands.GET.getBt());
+        });
+        clientView.setOnMouseClicked(click -> {
+            if (click.getClickCount() == 2 && clientView.getSelectionModel().getSelectedItem() != null) {
+                ChangeDirectory.change(clientView.getSelectionModel().getSelectedItem());
+                GetFiles.clientFiles();
+            }
+        });
+        serverView.setOnMouseClicked(click -> {
+            if (click.getClickCount() == 2 && serverView.getSelectionModel().getSelectedItem() != null) {
+                sendMsg(((char) Commands.CD.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
+                sendMsg(Commands.GET.getBt());
+            }
+        });
+    }
+
+    private void sendMsg(byte[] msg) {
+        try {
+            if (msg.length > 255) {
+                logArea.appendText("TOO MUCH BYTES, NEED TO FIX IT");
+            } else {
+                dos.write(msg.length);
+                dos.write(msg);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendMsg(byte msg) {
+        try {
+            dos.write(1);
+            dos.write(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void closeConnection() {
