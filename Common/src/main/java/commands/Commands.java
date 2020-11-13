@@ -8,7 +8,9 @@ public enum Commands {
     REMOVE ((byte) 50),
     GET((byte) 60),
     CD ((byte) 70),
-    LOG ((byte) 80);
+    LOG ((byte) 80),
+    UPLOAD_COMPLETED ((byte) 90),
+    DOWNLOAD_COMPLETED ((byte) 100);
 
     private final byte bt;
 
@@ -31,8 +33,12 @@ public enum Commands {
             return GET;
         } else if (bt == CD.bt) {
             return CD;
-        } else {
+        } else if (bt == LOG.bt) {
             return LOG;
+        } else if (bt == UPLOAD_COMPLETED.bt) {
+            return UPLOAD_COMPLETED;
+        } else {
+            return DOWNLOAD_COMPLETED;
         }
     }
 

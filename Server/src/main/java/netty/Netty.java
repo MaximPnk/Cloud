@@ -22,7 +22,7 @@ public class Netty {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel channel) {
-                            channel.config().setRecvByteBufAllocator(new FixedRecvByteBufAllocator(10000));
+                            channel.config().setRecvByteBufAllocator(new FixedRecvByteBufAllocator(50000));
                             channel.pipeline()
                                     .addLast(new ByteArrayEncoder(),
                                             new MainHandler());
