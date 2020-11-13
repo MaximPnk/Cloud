@@ -10,10 +10,15 @@ import java.util.List;
 
 public class ServerCommands {
 
-    private String rootPath = "Server/Storage";
+    private String username = ""; //TODO изменить
+    private String rootPath = "Server/Storage/" + username;
+
+    public ServerCommands(String username) {
+        this.username = username;
+    }
 
     public String cd(String selectedItem) {
-        if (selectedItem.equals("..") && !rootPath.equals("Server/Storage")) {
+        if (selectedItem.equals("..") && !rootPath.equals("Server/Storage" + username)) {
             rootPath = rootPath.substring(0, rootPath.lastIndexOf("/"));
             return "Path changed successfully";
         } else if (!selectedItem.contains(".")) {

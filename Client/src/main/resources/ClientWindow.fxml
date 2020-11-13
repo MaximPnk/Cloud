@@ -5,7 +5,7 @@
 
 <VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="graphics.Controller">
 
-    <HBox VBox.vgrow="ALWAYS" minHeight="300">
+    <HBox VBox.vgrow="ALWAYS" minHeight="300" visible="false">
         <VBox fx:id="clientSide" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <TextField fx:id="clientPath" editable="false" />
             <ListView fx:id="clientView" />
@@ -16,7 +16,7 @@
         </VBox>
     </HBox>
 
-    <VBox>
+    <VBox visible="false">
         <HBox alignment="CENTER">
             <Button prefWidth="250.0" fx:id="upload" text="Upload" />
             <Button prefWidth="250.0" fx:id="download" text="Download" />
@@ -31,6 +31,10 @@
             <Button prefWidth="750.0" fx:id="help" text="Help" />
         </HBox>
     </VBox>
+
+    <TextField fx:id="login" />
+    <TextField fx:id="password" />
+    <Button fx:id="authenticate" text="Auth" />
 
     <TextArea fx:id="logArea" editable="false" VBox.vgrow="ALWAYS" />
 </VBox>

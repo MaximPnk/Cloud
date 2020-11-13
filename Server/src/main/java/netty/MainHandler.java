@@ -1,6 +1,7 @@
 package netty;
 
 import commands.Commands;
+import db.DBCommands;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -13,7 +14,9 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     private ByteBuf buffer;
 
-    private final ServerCommands serverCommands = new ServerCommands();
+    private ServerCommands serverCommands;
+    private boolean auth;
+    private final DBCommands db = new DBCommands();
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -21,7 +24,29 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
         buffer.writeBytes(m);
         m.release();
 
+        //TODO раскомменить
+        /*if (auth) {
+            messageHandler(ctx);
+        } else {
+            authHandler(ctx);
+        }*/
         messageHandler(ctx);
+    }
+
+    private void authHandler(ChannelHandlerContext ctx) {
+        byte[] bytes = new byte[buffer.readableBytes()];
+        buffer.writeBytes(bytes);
+
+        String data = Convert.bytesToStr(bytes);
+        String login = data.split(" ")[0];
+        String password = data.split(" ")[1];
+        if (db.auth(login, password)) {
+            auth = true;
+            serverCommands = new ServerCommands(login);
+            ctx.writeAndFlush("YES".getBytes());
+        } else {
+            ctx.writeAndFlush("NO".getBytes());
+        }
     }
 
     private void messageHandler(ChannelHandlerContext ctx) {

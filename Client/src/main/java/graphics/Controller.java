@@ -61,17 +61,30 @@ public class Controller implements Initializable {
     @FXML
     public Button help;
 
+    @FXML
+    public TextField login;
+
+    @FXML
+    public TextField password;
+
+    @FXML
+    public Button authenticate;
+
     private static Socket socket = null;
     private static DataInputStream dis = null;
     private static DataOutputStream dos = null;
     private static boolean connected;
     private static final ClientCommands clientCommands = new ClientCommands();
+    private static boolean auth;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         connect();
         setClickActions();
+
+        //TODO add new stage for login
+
         get.fire();
 
         Thread read = new Thread(() -> {
