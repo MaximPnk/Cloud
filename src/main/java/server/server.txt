@@ -1,2 +1,0 @@
-created netty server on master branch
-https://github.com/MaximPnk/Cloud/tree/master/src/main/java/server
