@@ -10,7 +10,8 @@ public enum Commands {
     CD ((byte) 70),
     LOG ((byte) 80),
     UPLOAD_COMPLETED ((byte) 90),
-    DOWNLOAD_COMPLETED ((byte) 100);
+    DOWNLOAD_COMPLETED ((byte) 100),
+    AUTH ((byte) 110);
 
     private final byte bt;
 
@@ -37,8 +38,10 @@ public enum Commands {
             return LOG;
         } else if (bt == UPLOAD_COMPLETED.bt) {
             return UPLOAD_COMPLETED;
-        } else {
+        } else if (bt == DOWNLOAD_COMPLETED.bt) {
             return DOWNLOAD_COMPLETED;
+        } else {
+            return AUTH;
         }
     }
 

@@ -14,6 +14,18 @@ import java.util.List;
 
 public class ClientCommands {
 
+    private static ClientCommands instance;
+
+    private ClientCommands() {
+    }
+
+    public static synchronized ClientCommands getInstance() {
+        if (instance == null) {
+            instance = new ClientCommands();
+        }
+        return instance;
+    }
+
     private String rootPath = "Client/Storage";
 
     public void change(String selectedItem) {
@@ -25,15 +37,15 @@ public class ClientCommands {
     }
 
     public void log(String str) {
-        Window.getController().logArea.appendText(str + System.lineSeparator());
+        Window.getClientController().logArea.appendText(str + System.lineSeparator());
     }
 
     public void serverFiles(String list) {
         String[] files = list.split(" ");
         Platform.runLater(() -> {
-            Window.getController().serverPath.setText(files[0]);
+            Window.getClientController().serverPath.setText(files[0]);
             files[0] = "..";
-            Window.getController().serverView.setItems(FXCollections.observableArrayList(files));
+            Window.getClientController().serverView.setItems(FXCollections.observableArrayList(files));
         });
     }
 
@@ -42,13 +54,13 @@ public class ClientCommands {
         assert files != null;
         String[] arr = (".. " + String.join(" ", files)).split(" ");
         Platform.runLater(() -> {
-            Window.getController().clientPath.setText(rootPath);
-            Window.getController().clientView.setItems(FXCollections.observableArrayList(arr));
+            Window.getClientController().clientPath.setText(rootPath);
+            Window.getClientController().clientView.setItems(FXCollections.observableArrayList(arr));
         });
     }
 
     public void help() {
-        Window.getController().help.setOnAction(click -> {
+        Window.getClientController().help.setOnAction(click -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Help");
             alert.setHeaderText(null);

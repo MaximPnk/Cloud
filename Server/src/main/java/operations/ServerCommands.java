@@ -13,6 +13,9 @@ public class ServerCommands {
     private String username = ""; //TODO изменить
     private String rootPath = "Server/Storage/" + username;
 
+    public ServerCommands() {
+    }
+
     public ServerCommands(String username) {
         this.username = username;
     }
@@ -96,5 +99,9 @@ public class ServerCommands {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public String getRootPath() {
+        return rootPath;
     }
 }

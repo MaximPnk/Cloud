@@ -1,35 +1,77 @@
 package graphics;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import service.ServerConnection;
+
+import java.io.IOException;
 
 public class Window extends Application {
 
     static FXMLLoader loader;
+    static Stage stage;
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-//        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("ClientWindow.fxml")));
-        loader = new FXMLLoader(getClass().getClassLoader().getResource("ClientWindow.fxml"));
-        Parent root = loader.load();
+    public void start(Stage primaryStage) {
+        loader = new FXMLLoader(getClass().getClassLoader().getResource("AuthWindow.fxml"));
+        Parent root = null;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        stage = primaryStage;
 
-        primaryStage.setTitle("File Commander");
-        primaryStage.setMinHeight(200);
-        primaryStage.setMinWidth(300);
-        primaryStage.setScene(new Scene(root, 700, 700));
-        primaryStage.show();
-        primaryStage.setOnCloseRequest(event -> Controller.closeConnection());
+        stage.setTitle("File Commander");
+        stage.setScene(new Scene(root, 200, 200));
+        stage.setOnCloseRequest(event -> ServerConnection.closeConnection());
+        stage.show();
     }
+
+    public static void loginPage() {
+        loader = new FXMLLoader(Window.class.getClassLoader().getResource("AuthWindow.fxml"));
+        Parent root = null;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        stage.setScene(new Scene(root, 700, 700));
+        stage.show();
+    }
+
+    public static void clientPage() {
+        loader = new FXMLLoader(Window.class.getClassLoader().getResource("ClientWindow.fxml"));
+        Parent root = null;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Parent finalRoot = root;
+        Platform.runLater(() -> {
+            stage.setScene(new Scene(finalRoot, 700, 700));
+            stage.show();
+        });
+    }
+
+
 
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    public static Controller getController() {
+    public static ClientController getClientController() {
+        return loader.getController();
+    }
+
+    public static AuthController getAuthController() {
         return loader.getController();
     }
 }

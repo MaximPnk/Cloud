@@ -14,8 +14,7 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     private ByteBuf buffer;
 
-    private ServerCommands serverCommands;
-    private boolean auth;
+    private final ServerCommands serverCommands = new ServerCommands();
     private final DBCommands db = new DBCommands();
 
     @Override
@@ -24,29 +23,7 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
         buffer.writeBytes(m);
         m.release();
 
-        //TODO раскомменить
-        /*if (auth) {
-            messageHandler(ctx);
-        } else {
-            authHandler(ctx);
-        }*/
         messageHandler(ctx);
-    }
-
-    private void authHandler(ChannelHandlerContext ctx) {
-        byte[] bytes = new byte[buffer.readableBytes()];
-        buffer.writeBytes(bytes);
-
-        String data = Convert.bytesToStr(bytes);
-        String login = data.split(" ")[0];
-        String password = data.split(" ")[1];
-        if (db.auth(login, password)) {
-            auth = true;
-            serverCommands = new ServerCommands(login);
-            ctx.writeAndFlush("YES".getBytes());
-        } else {
-            ctx.writeAndFlush("NO".getBytes());
-        }
     }
 
     private void messageHandler(ChannelHandlerContext ctx) {
@@ -71,6 +48,11 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     private void operationHandler(ChannelHandlerContext ctx, byte[] msg, byte command) {
         switch (Commands.getCommand(command)) {
+            case AUTH:
+                String login = Convert.bytesToStr(msg).split(" ")[0];
+                String password = Convert.bytesToStr(msg).split(" ")[1];
+                sendMsg(ctx, ((char) Commands.AUTH.getBt() + (db.auth(login, password) ? "ALLOWED" : "DENIED")).getBytes());
+                break;
             case DOWNLOAD:
                 serverCommands.download(Convert.bytesToStr(msg)).forEach(m -> sendMsg(ctx, m));
                 sendMsg(ctx, ((char) Commands.DOWNLOAD_COMPLETED.getBt() + "Download completed").getBytes());
