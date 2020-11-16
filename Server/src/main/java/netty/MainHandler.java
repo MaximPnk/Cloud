@@ -9,6 +9,7 @@ import service.Convert;
 import operations.ServerCommands;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class MainHandler extends ChannelInboundHandlerAdapter {
 
@@ -48,37 +49,47 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
 
     private void operationHandler(ChannelHandlerContext ctx, byte[] msg, byte command) {
         switch (Commands.getCommand(command)) {
+            case REG:
+                String loginReg = Convert.bytesToStr(msg).split(" ")[0];
+                String passReg = Convert.bytesToStr(msg).split(" ")[1];
+                if (db.loginExists(loginReg)) {
+                    sendMsg(ctx, ((char) command + "FAIL").getBytes());
+                } else {
+                    db.registration(loginReg, passReg);
+                    sendMsg(ctx, ((char) command + "SUCCESS").getBytes());
+                }
+                break;
             case AUTH:
-                String login = Convert.bytesToStr(msg).split(" ")[0];
-                String password = Convert.bytesToStr(msg).split(" ")[1];
-                sendMsg(ctx, ((char) Commands.AUTH.getBt() + (db.auth(login, password) ? "ALLOWED" : "DENIED")).getBytes());
+                String loginAuth = Convert.bytesToStr(msg).split(" ")[0];
+                String passAuth = Convert.bytesToStr(msg).split(" ")[1];
+                sendMsg(ctx, ((char) command + (db.auth(loginAuth, passAuth) ? "SUCCESS" : "FAIL")).getBytes());
                 break;
             case DOWNLOAD:
                 serverCommands.download(Convert.bytesToStr(msg)).forEach(m -> sendMsg(ctx, m));
-                sendMsg(ctx, ((char) Commands.DOWNLOAD_COMPLETED.getBt() + "Download completed").getBytes());
+                sendMsg(ctx, ((char) command + "Download completed").getBytes());
                 break;
             case UPLOAD:
                 serverCommands.upload(msg);
                 break;
             case MKDIR:
                 System.out.println("MKDIR");
-                sendMsg(ctx, ((char) Commands.MKDIR.getBt() + "Creating directory " + (serverCommands.mkdir(Convert.bytesToStr(msg)) ? "success" : "failed")).getBytes());
+                sendMsg(ctx, ((char) command + "Creating directory " + (serverCommands.mkdir(Convert.bytesToStr(msg)) ? "success" : "failed")).getBytes());
                 break;
             case TOUCH:
                 System.out.println("TOUCH");
-                sendMsg(ctx, ((char) Commands.TOUCH.getBt() + "Creating file " + (serverCommands.touch(Convert.bytesToStr(msg)) ? "success" : "failed")).getBytes());
+                sendMsg(ctx, ((char) command + "Creating file " + (serverCommands.touch(Convert.bytesToStr(msg)) ? "success" : "failed")).getBytes());
                 break;
             case REMOVE:
                 System.out.println("REMOVE");
-                sendMsg(ctx, ((char) Commands.REMOVE.getBt() + "Removing " + (serverCommands.rm(Convert.bytesToStr(msg)) ? "success" : "failed")).getBytes());
+                sendMsg(ctx, ((char) command + "Removing " + (serverCommands.rm(Convert.bytesToStr(msg)) ? "success" : "failed")).getBytes());
                 break;
             case GET:
                 System.out.println("GET");
-                sendMsg(ctx, ((char) Commands.GET.getBt() + serverCommands.get()).getBytes());
+                sendMsg(ctx, ((char) command + serverCommands.get()).getBytes());
                 break;
             case CD:
                 System.out.println("CD");
-                sendMsg(ctx, ((char) Commands.LOG.getBt() + serverCommands.cd(Convert.bytesToStr(msg))).getBytes());
+                sendMsg(ctx, ((char) command + serverCommands.cd(Convert.bytesToStr(msg))).getBytes());
                 break;
         }
     }

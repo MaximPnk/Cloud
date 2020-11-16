@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.RegController">
+    <HBox>
+        <Label text="Login" prefWidth="75" />
+        <TextField fx:id="login" />
+    </HBox>
+    <HBox>
+        <Label text="Password" prefWidth="75" />
+        <TextField fx:id="password" />
+    </HBox>
+    <HBox>
+        <Label text="Repeat pass" prefWidth="75" />
+        <TextField fx:id="repeatPass" />
+    </HBox>
+    <Label alignment="CENTER" fx:id="info" prefWidth="200" prefHeight="50" />
+    <HBox alignment="CENTER" prefWidth="200">
+        <Button fx:id="reg" prefWidth="100" text="Register" />
+        <Button fx:id="auth" prefWidth="100" text="Back to auth page" />
+    </HBox>
+</VBox>

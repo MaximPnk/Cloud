@@ -40,9 +40,27 @@ public class Window extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Parent finalRoot = root;
+        Platform.runLater(() -> {
+            stage.setScene(new Scene(finalRoot, 200, 200));
+            stage.show();
+        });
+    }
 
-        stage.setScene(new Scene(root, 700, 700));
-        stage.show();
+    public static void regPage() {
+        loader = new FXMLLoader(Window.class.getClassLoader().getResource("RegWindow.fxml"));
+        Parent root = null;
+        try {
+            root = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Parent finalRoot = root;
+        Platform.runLater(() -> {
+            stage.setScene(new Scene(finalRoot, 200, 200));
+            stage.show();
+        });
     }
 
     public static void clientPage() {
@@ -72,6 +90,10 @@ public class Window extends Application {
     }
 
     public static AuthController getAuthController() {
+        return loader.getController();
+    }
+
+    public static RegController getRegController() {
         return loader.getController();
     }
 }

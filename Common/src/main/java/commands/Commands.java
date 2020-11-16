@@ -2,16 +2,17 @@ package commands;
 
 public enum Commands {
     UPLOAD ((byte) 10),
-    DOWNLOAD ((byte) 20),
-    MKDIR ((byte) 30),
-    TOUCH ((byte) 40),
-    REMOVE ((byte) 50),
-    GET((byte) 60),
-    CD ((byte) 70),
-    LOG ((byte) 80),
-    UPLOAD_COMPLETED ((byte) 90),
-    DOWNLOAD_COMPLETED ((byte) 100),
-    AUTH ((byte) 110);
+    DOWNLOAD ((byte) 11),
+    MKDIR ((byte) 12),
+    TOUCH ((byte) 13),
+    REMOVE ((byte) 14),
+    GET((byte) 15),
+    CD ((byte) 16),
+    LOG ((byte) 17),
+    UPLOAD_COMPLETED ((byte) 18),
+    DOWNLOAD_COMPLETED ((byte) 19),
+    AUTH ((byte) 20),
+    REG ((byte) 21);
 
     private final byte bt;
 
@@ -40,8 +41,10 @@ public enum Commands {
             return UPLOAD_COMPLETED;
         } else if (bt == DOWNLOAD_COMPLETED.bt) {
             return DOWNLOAD_COMPLETED;
-        } else {
+        } else if (bt == AUTH.bt) {
             return AUTH;
+        } else {
+            return REG;
         }
     }
 

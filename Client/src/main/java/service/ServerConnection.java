@@ -23,7 +23,6 @@ public class ServerConnection {
     private static final ClientCommands clientCommands = ClientCommands.getInstance();
 
     private ServerConnection() {
-        System.out.println("в конструкторе ServerConnection");
         connect();
 
         Thread read = new Thread(() -> {
@@ -86,8 +85,15 @@ public class ServerConnection {
     private void handleCommand(byte command, byte[] input) {
 
         switch (Commands.getCommand(command)) {
+            case REG:
+                if (Convert.bytesToStr(input).equals("SUCCESS")) {
+                    Platform.runLater(() -> Window.getRegController().info.setText("Registration successful"));
+                } else {
+                    Platform.runLater(() -> Window.getRegController().info.setText("Login already exists"));
+                }
+                break;
             case AUTH:
-                if (Convert.bytesToStr(input).equals("ALLOWED")) {
+                if (Convert.bytesToStr(input).equals("SUCCESS")) {
                     Window.clientPage();
                 } else {
                     Platform.runLater(() -> Window.getAuthController().info.setText("Incorrect login or password"));
@@ -112,7 +118,6 @@ public class ServerConnection {
     }
 
     public void sendMsg(byte[] msg) {
-        System.out.println(Arrays.toString(msg));
         try {
             byte[] msgLengthInBytes = BigInteger.valueOf(msg.length).toByteArray();
             int lengthOfBytes = msgLengthInBytes.length;

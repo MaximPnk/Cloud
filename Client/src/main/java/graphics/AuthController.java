@@ -23,6 +23,9 @@ public class AuthController implements Initializable {
     public Button authenticate;
 
     @FXML
+    public Button registration;
+
+    @FXML
     public Label info;
 
     private static final ServerConnection connection = ServerConnection.getInstance();
@@ -37,6 +40,9 @@ public class AuthController implements Initializable {
             if (login.getText().matches("^[\\w\\p{Po}]+$") && password.getText().matches("^[\\w\\p{Po}]+$")) {
                 connection.sendMsg(((char) Commands.AUTH.getBt() + login.getText() + " " + password.getText()).getBytes());
             }
+        });
+        registration.setOnAction(click -> {
+            Window.regPage();
         });
     }
 }

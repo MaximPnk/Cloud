@@ -14,10 +14,23 @@ public class DBCommands {
             ps.setString(2, password);
             ResultSet set = ps.executeQuery();
             return set.next();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean loginExists(String login) {
+        PreparedStatement ps;
+        try {
+            ps = DataSource.getConnection().prepareStatement("select * from auth where login=?");
+            ps.setString(1, login);
+            ResultSet set = ps.executeQuery();
+            return set.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     public void registration(String login, String password) {
@@ -27,8 +40,8 @@ public class DBCommands {
             ps.setString(1, login);
             ps.setString(2, password);
             ps.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
