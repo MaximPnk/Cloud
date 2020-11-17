@@ -13,6 +13,7 @@ import java.io.IOException;
 public class Window extends Application {
 
     static FXMLLoader loader;
+    static Parent parent;
     static Stage stage;
 
     @Override
@@ -24,10 +25,11 @@ public class Window extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        parent = root;
         stage = primaryStage;
 
         stage.setTitle("File Commander");
-        stage.setScene(new Scene(root, 200, 200));
+        stage.setScene(new Scene(root, 350, 170));
         stage.setOnCloseRequest(event -> ServerConnection.closeConnection());
         stage.show();
     }
@@ -40,9 +42,10 @@ public class Window extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        parent = root;
         Parent finalRoot = root;
         Platform.runLater(() -> {
-            stage.setScene(new Scene(finalRoot, 200, 200));
+            stage.setScene(new Scene(finalRoot, 350, 170));
             stage.show();
         });
     }
@@ -55,10 +58,11 @@ public class Window extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        parent = root;
 
         Parent finalRoot = root;
         Platform.runLater(() -> {
-            stage.setScene(new Scene(finalRoot, 200, 200));
+            stage.setScene(new Scene(finalRoot, 400, 200));
             stage.show();
         });
     }
@@ -71,9 +75,12 @@ public class Window extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        parent = root;
         Parent finalRoot = root;
         Platform.runLater(() -> {
             stage.setScene(new Scene(finalRoot, 700, 700));
+            stage.centerOnScreen();
+            stage.sizeToScene();
             stage.show();
         });
     }

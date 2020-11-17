@@ -70,7 +70,7 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
                 break;
             case DOWNLOAD:
                 serverCommands.download(Convert.bytesToStr(msg)).forEach(m -> sendMsg(ctx, m));
-                sendMsg(ctx, ((char) command + "Download completed").getBytes());
+                sendMsg(ctx, ((char) Commands.LOG.getBt() + "Download completed").getBytes());
                 break;
             case UPLOAD:
                 serverCommands.upload(msg);

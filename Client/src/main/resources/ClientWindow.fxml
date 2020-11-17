@@ -4,16 +4,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.ClientController">
+<VBox alignment="center" style="-fx-background-color: #cbffff" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.ClientController">
 
-    <HBox minHeight="300" VBox.vgrow="ALWAYS">
+    <HBox prefHeight="450" VBox.vgrow="ALWAYS">
         <VBox fx:id="clientSide" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <TextField fx:id="clientPath" editable="false" />
-            <ListView fx:id="clientView" />
+            <ListView prefHeight="500" fx:id="clientView" />
         </VBox>
         <VBox fx:id="serverSide" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <TextField fx:id="serverPath" editable="false" />
-            <ListView fx:id="serverView" />
+            <ListView prefHeight="500" fx:id="serverView" />
         </VBox>
     </HBox>
 
@@ -24,18 +24,13 @@
             <Button fx:id="get" prefWidth="250.0" text="Update list" />
         </HBox>
         <HBox alignment="CENTER">
-            <Button fx:id="mkdir" prefWidth="250.0" text="New directory" />
-            <Button fx:id="touch" prefWidth="250.0" text="New file" />
-            <Button fx:id="remove" prefWidth="250.0" text="Remove" />
-        </HBox>
-        <HBox alignment="CENTER">
             <Button fx:id="help" prefWidth="750.0" text="Help" />
         </HBox>
     </VBox>
 
-    <TextArea fx:id="logArea" editable="false" prefHeight="214.0" prefWidth="750.0" VBox.vgrow="ALWAYS">
+    <TextArea fx:id="logArea" editable="false" prefHeight="200" prefWidth="750.0" VBox.vgrow="ALWAYS">
       <font>
-         <Font name="Arial Bold" size="18.0" />
+         <Font name="MV Boli" size="18.0" />
       </font>
     </TextArea>
 </VBox>

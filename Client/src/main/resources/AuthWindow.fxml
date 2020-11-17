@@ -3,18 +3,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.AuthController">
-    <HBox>
-        <Label text="Login" prefWidth="75" />
+<VBox style="-fx-background-color: #cbffff" alignment="center" prefHeight="170.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.AuthController">
+    <HBox alignment="TOP_CENTER" style="-fx-padding: 0 0 5">
+        <Label style="-fx-font-size: 14" prefWidth="75" text="Login" />
         <TextField fx:id="login" />
     </HBox>
-    <HBox>
-        <Label text="Password" prefWidth="75" />
-        <TextField fx:id="password" />
+    <HBox alignment="TOP_CENTER">
+        <Label style="-fx-font-size: 14" prefWidth="75" text="Password" />
+        <PasswordField fx:id="password" onAction="#auth" />
     </HBox>
-    <Label alignment="CENTER" fx:id="info" prefWidth="200" prefHeight="50" />
-    <HBox alignment="CENTER" prefWidth="200">
-        <Button fx:id="authenticate" prefWidth="100" text="Auth" />
-        <Button fx:id="registration" prefWidth="100" text="Registration" />
+    <Label fx:id="info" alignment="CENTER" prefHeight="50" prefWidth="350" />
+    <HBox alignment="CENTER" prefWidth="200" spacing="30">
+        <Button fx:id="authenticate" style="-fx-background-radius: 6" cache="true" prefWidth="100" text="Auth" onAction="#auth" />
+        <Button fx:id="registration" style="-fx-background-radius: 6" prefWidth="100" text="Registration" />
     </HBox>
 </VBox>

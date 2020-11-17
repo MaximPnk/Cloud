@@ -3,22 +3,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.RegController">
-    <HBox>
+<VBox style="-fx-background-color: #cbffff" alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.RegController">
+    <HBox alignment="TOP_CENTER" style="-fx-padding: 0 0 5">
         <Label text="Login" prefWidth="75" />
         <TextField fx:id="login" />
     </HBox>
-    <HBox>
+    <HBox alignment="TOP_CENTER" style="-fx-padding: 0 0 5">
         <Label text="Password" prefWidth="75" />
-        <TextField fx:id="password" />
+        <PasswordField fx:id="password" />
     </HBox>
-    <HBox>
+    <HBox alignment="TOP_CENTER">
         <Label text="Repeat pass" prefWidth="75" />
-        <TextField fx:id="repeatPass" />
+        <PasswordField fx:id="repeatPass" onAction="#reg" />
     </HBox>
-    <Label alignment="CENTER" fx:id="info" prefWidth="200" prefHeight="50" />
-    <HBox alignment="CENTER" prefWidth="200">
-        <Button fx:id="reg" prefWidth="100" text="Register" />
-        <Button fx:id="auth" prefWidth="100" text="Back to auth page" />
+    <Label alignment="CENTER" fx:id="info" prefWidth="400" prefHeight="50" />
+    <HBox alignment="CENTER" prefWidth="400" spacing="30">
+        <Button fx:id="reg" prefWidth="100" text="Register" style="-fx-background-radius: 6" onAction="#reg" />
+        <Button fx:id="auth" prefWidth="100" text="Back to auth page" style="-fx-background-radius: 6" />
     </HBox>
 </VBox>

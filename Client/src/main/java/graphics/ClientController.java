@@ -6,17 +6,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import operations.ClientCommands;
-import service.Convert;
 import service.ServerConnection;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.Socket;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -40,15 +35,6 @@ public class ClientController implements Initializable {
 
     @FXML
     public VBox serverSide;
-
-    @FXML
-    public Button mkdir;
-
-    @FXML
-    public Button touch;
-
-    @FXML
-    public Button remove;
 
     @FXML
     public Button upload;
@@ -84,12 +70,13 @@ public class ClientController implements Initializable {
     }
 
     private void setClickActions() {
+
         clientCommands.help();
 
         upload.setOnAction(click -> {
             if (clientView.getSelectionModel().getSelectedItem() != null && clientView.getSelectionModel().getSelectedItem().contains(".")) {
                 clientCommands.uploadFile(clientView.getSelectionModel().getSelectedItem()).forEach(connection::sendMsg);
-                logArea.appendText("Upload completed" + System.lineSeparator());
+                clientCommands.log("Upload completed");
                 get.fire();
             }
         });
@@ -100,58 +87,38 @@ public class ClientController implements Initializable {
             }
         });
 
-        mkdir.setOnAction(click -> {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Create new directory");
-            dialog.setHeaderText("Enter directory name");
-            dialog.getDialogPane().setHeader(null);
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(name -> {
-                if (name.matches("^[\\w]+$")) {
-                    connection.sendMsg(((char) Commands.MKDIR.getBt() + name).getBytes());
-                } else {
-                    logArea.appendText("Invalid directory name" + System.lineSeparator());
-                }
-            });
-            get.fire();
-        });
-
-        touch.setOnAction(click -> {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Make new file");
-            dialog.setHeaderText("Enter file name");
-            dialog.getDialogPane().setHeader(null);
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(name -> {
-                if (name.matches("^[\\w]+\\.[a-zA-Z]+$")) {
-                    connection.sendMsg(((char) Commands.TOUCH.getBt() + name).getBytes());
-                } else {
-                    logArea.appendText("Invalid file name" + System.lineSeparator());
-                }
-            });
-            get.fire();
-        });
-
-        remove.setOnAction(click -> {
-            if (serverView.getSelectionModel().getSelectedItem() != null) {
-                connection.sendMsg(((char) Commands.REMOVE.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
-            }
-            get.fire();
-        });
-
         get.setOnAction(click -> connection.sendMsg(Commands.GET.getBt()));
 
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem mkdir = new MenuItem("Create new folder");
+        MenuItem remove = new MenuItem("Remove");
+        contextMenu.getItems().addAll(mkdir, remove);
+        clientView.setContextMenu(contextMenu);
+        serverView.setContextMenu(contextMenu);
+
         clientView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2 && clientView.getSelectionModel().getSelectedItem() != null) {
+            download.setDisable(true);
+            upload.setDisable(false);
+            if (click.getButton() == MouseButton.PRIMARY && click.getClickCount() == 2 && clientView.getSelectionModel().getSelectedItem() != null) {
                 clientCommands.change(clientView.getSelectionModel().getSelectedItem());
                 clientCommands.clientFiles();
+            } else if (click.getButton() == MouseButton.SECONDARY) {
+                mkdir.setOnAction(e -> clientMkdir());
+                remove.setOnAction(e -> clientRemove());
+                contextMenu.show(Window.parent, click.getScreenX(), click.getScreenY());
             }
         });
 
         serverView.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2 && serverView.getSelectionModel().getSelectedItem() != null) {
+            download.setDisable(false);
+            upload.setDisable(true);
+            if (click.getButton() == MouseButton.PRIMARY && click.getClickCount() == 2 && serverView.getSelectionModel().getSelectedItem() != null) {
                 connection.sendMsg(((char) Commands.CD.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
                 connection.sendMsg(Commands.GET.getBt());
+            } else if (click.getButton() == MouseButton.SECONDARY) {
+                mkdir.setOnAction(e -> srvMkdir());
+                remove.setOnAction(e -> srvRemove());
+                contextMenu.show(Window.parent, click.getScreenX(), click.getScreenY());
             }
         });
 
@@ -222,5 +189,55 @@ public class ClientController implements Initializable {
                 }
             }
         });
+    }
+
+    private void clientMkdir() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Create new directory");
+        dialog.setHeaderText("Enter directory name");
+        dialog.getDialogPane().setHeader(null);
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            if (name.matches("^[\\w\\s]+$") && clientCommands.mkdir(name)) {
+                clientCommands.log("Successfully created");
+            } else {
+                clientCommands.log("Invalid directory name");
+            }
+        });
+        get.fire();
+    }
+
+    private void clientRemove() {
+        if (clientView.getSelectionModel().getSelectedItem() != null) {
+            if (clientCommands.remove(clientView.getSelectionModel().getSelectedItem())) {
+                clientCommands.log("Successfully deleted");
+            } else {
+                clientCommands.log("Can't delete");
+            }
+        }
+        get.fire();
+    }
+
+    private void srvRemove() {
+        if (serverView.getSelectionModel().getSelectedItem() != null) {
+            connection.sendMsg(((char) Commands.REMOVE.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
+        }
+        get.fire();
+    }
+
+    private void srvMkdir() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Create new directory");
+        dialog.setHeaderText("Enter directory name");
+        dialog.getDialogPane().setHeader(null);
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            if (name.matches("^[\\w\\s]+$")) {
+                connection.sendMsg(((char) Commands.MKDIR.getBt() + name).getBytes());
+            } else {
+                clientCommands.log("Invalid directory name");
+            }
+        });
+        get.fire();
     }
 }

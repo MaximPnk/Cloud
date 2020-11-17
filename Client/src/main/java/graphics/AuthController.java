@@ -1,6 +1,7 @@
 package graphics;
 
 import commands.Commands;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -36,13 +37,14 @@ public class AuthController implements Initializable {
     }
 
     private void setClickActions() {
-        authenticate.setOnAction(click -> {
-            if (login.getText().matches("^[\\w\\p{Po}]+$") && password.getText().matches("^[\\w\\p{Po}]+$")) {
-                connection.sendMsg(((char) Commands.AUTH.getBt() + login.getText() + " " + password.getText()).getBytes());
-            }
-        });
         registration.setOnAction(click -> {
             Window.regPage();
         });
+    }
+
+    public void auth(ActionEvent actionEvent) {
+        if (login.getText().matches("^[\\w\\p{Po}]+$") && password.getText().matches("^[\\w\\p{Po}]+$")) {
+            connection.sendMsg(((char) Commands.AUTH.getBt() + login.getText() + " " + password.getText()).getBytes());
+        }
     }
 }

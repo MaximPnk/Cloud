@@ -6,12 +6,11 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ListCell;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import service.Convert;
 
 import java.io.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,22 +30,26 @@ public class ClientCommands {
         return instance;
     }
 
-    private String rootPath = "Client/Storage";
+    private String rootPath = new File("Client/Storage").getAbsolutePath().replace("\\", "/");
 
     public void change(String selectedItem) {
-        if (selectedItem.equals("..") && !rootPath.equals("Client/Storage")) {
+        if (rootPath.endsWith("/")) {
+            rootPath = rootPath.substring(0, rootPath.length() - 1);
+        }
+        if (selectedItem.equals("..") && !rootPath.equals("C:")) {
             rootPath = rootPath.substring(0, rootPath.lastIndexOf("/"));
         } else if (!selectedItem.contains(".")) {
             rootPath = rootPath + "/" + selectedItem;
         }
+        rootPath = rootPath.concat("/");
     }
 
     public void log(String str) {
-        Window.getClientController().logArea.appendText(str + System.lineSeparator());
+        Window.getClientController().logArea.appendText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")) + ": " + str + System.lineSeparator());
     }
 
     public void serverFiles(String text) {
-        String[] files = text.split(" ");
+        String[] files = text.split("#");
         String[] arr = Arrays.copyOfRange(files, 1, files.length);
         ObservableList<String> list = FXCollections.observableArrayList();
         list.add("..");
@@ -59,11 +62,11 @@ public class ClientCommands {
 
     public void clientFiles() {
         String[] files = new File(rootPath).list();
-        assert files != null;
-        String[] arr = (String.join(" ", files)).split(" ");
         ObservableList<String> list = FXCollections.observableArrayList();
         list.add("..");
-        list.addAll(Arrays.stream(arr).sorted(Comparator.comparingInt(fl -> fl.indexOf("."))).toArray(String[]::new));
+        if (files != null) {
+            list.addAll(Arrays.stream(files).sorted(Comparator.comparingInt(fl -> fl.indexOf("."))).toArray(String[]::new));
+        }
         Platform.runLater(() -> {
             Window.getClientController().clientPath.setText(rootPath);
             Window.getClientController().clientView.setItems(FXCollections.observableArrayList(list));
@@ -131,5 +134,13 @@ public class ClientCommands {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean mkdir(String dirName) {
+        return new File(rootPath + "/" + dirName).mkdir();
+    }
+
+    public boolean remove(String name) {
+        return new File(rootPath + "/" + name).delete();
     }
 }

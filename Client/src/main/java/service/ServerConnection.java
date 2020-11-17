@@ -7,6 +7,7 @@ import operations.ClientCommands;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -79,8 +80,7 @@ public class ServerConnection {
 
         if (length != -1) {
             handleCommand(command, b);
-            System.out.println(command);
-            System.out.println(Arrays.toString(b));
+            System.out.println(Convert.bytesToStr(b));
         }
     }
 
@@ -97,6 +97,7 @@ public class ServerConnection {
             case AUTH:
                 if (Convert.bytesToStr(input).equals("SUCCESS")) {
                     Window.clientPage();
+                    clientCommands.log("Welcome to File Commander");
                 } else {
                     Platform.runLater(() -> Window.getAuthController().info.setText("Incorrect login or password"));
                 }

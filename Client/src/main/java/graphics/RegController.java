@@ -1,6 +1,7 @@
 package graphics;
 
 import commands.Commands;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -42,15 +43,15 @@ public class RegController implements Initializable {
         auth.setOnAction(click -> {
             Window.loginPage();
         });
+    }
 
-        reg.setOnAction(click -> {
-            if (!password.getText().equals(repeatPass.getText())) {
-                info.setText("Passwords are not equals");
-            } else if (!login.getText().matches("^[\\w\\p{Po}]+$") || !password.getText().matches("^[\\w\\p{Po}]+$")) {
-                info.setText("Bad input values for login or password");
-            } else {
-                connection.sendMsg(((char) Commands.REG.getBt() + login.getText() + " " + password.getText()).getBytes());
-            }
-        });
+    public void reg(ActionEvent actionEvent) {
+        if (!password.getText().equals(repeatPass.getText())) {
+            info.setText("Passwords are not equals");
+        } else if (!login.getText().matches("^[\\w\\p{Po}]+$") || !password.getText().matches("^[\\w\\p{Po}]+$")) {
+            info.setText("Bad input values for login or password");
+        } else {
+            connection.sendMsg(((char) Commands.REG.getBt() + login.getText() + " " + password.getText()).getBytes());
+        }
     }
 }
