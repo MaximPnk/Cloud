@@ -80,13 +80,12 @@ public class ClientCommands {
             alert.setHeaderText(null);
             alert.getDialogPane().setPrefWidth(600);
             alert.setContentText(
-                    "• Change directory: double click on a folder or \"..\" to return to the parent directory [Client/Server]" + System.lineSeparator() + System.lineSeparator() +
-                            "• Download: select file in the server window and click the download button [Server]" + System.lineSeparator() + System.lineSeparator() +
-                            "• Upload: select file in the client window and click the upload button [Client]" + System.lineSeparator() + System.lineSeparator() +
-                            "• Get: click for update file lists [Client/Server]" + System.lineSeparator() + System.lineSeparator() +
-                            "• Make directory: select server path and click mkdir button [Server]" + System.lineSeparator() + System.lineSeparator() +
-                            "• Create file: select server path and click touch button [Server]" + System.lineSeparator() + System.lineSeparator() +
-                            "• Remove: select file in the server window and click remove button [Server]");
+                    "• Change directory: double click on a folder or \"..\" to return to the parent directory" + System.lineSeparator() + System.lineSeparator() +
+                            "• Download: select file on the server window and click the download button" + System.lineSeparator() + System.lineSeparator() +
+                            "• Upload: select file in the client window and click the upload button" + System.lineSeparator() + System.lineSeparator() +
+                            "• Update: click for update file lists" + System.lineSeparator() + System.lineSeparator() +
+                            "• Make directory: right click on each window" + System.lineSeparator() + System.lineSeparator() +
+                            "• Remove: right click on each window");
             alert.showAndWait();
         });
     }
