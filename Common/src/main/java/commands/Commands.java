@@ -21,6 +21,7 @@ public enum Commands {
     }
 
     public static Commands getCommand(byte bt) {
+        System.out.println(bt);
         if (bt == UPLOAD.bt) {
             return UPLOAD;
         } else if (bt == DOWNLOAD.bt) {

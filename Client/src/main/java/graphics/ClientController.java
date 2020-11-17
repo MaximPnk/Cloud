@@ -4,6 +4,8 @@ import commands.Commands;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import operations.ClientCommands;
 import service.Convert;
@@ -11,6 +13,7 @@ import service.ServerConnection;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -64,6 +67,15 @@ public class ClientController implements Initializable {
 
     private static final ServerConnection connection = ServerConnection.getInstance();
     private static final ClientCommands clientCommands = ClientCommands.getInstance();
+
+    private static final Image back = new Image(new File("Client/src/main/resources/icons/back.png").toURI().toString());
+    private static final Image doc = new Image(new File("Client/src/main/resources/icons/doc.png").toURI().toString());
+    private static final Image folder = new Image(new File("Client/src/main/resources/icons/folder.png").toURI().toString());
+    private static final Image img = new Image(new File("Client/src/main/resources/icons/img.png").toURI().toString());
+    private static final Image pdf = new Image(new File("Client/src/main/resources/icons/pdf.png").toURI().toString());
+    private static final Image txt = new Image(new File("Client/src/main/resources/icons/txt.png").toURI().toString());
+    private static final Image unknown = new Image(new File("Client/src/main/resources/icons/unknown.png").toURI().toString());
+    private static final Image zip = new Image(new File("Client/src/main/resources/icons/zip.png").toURI().toString());
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -140,6 +152,74 @@ public class ClientController implements Initializable {
             if (click.getClickCount() == 2 && serverView.getSelectionModel().getSelectedItem() != null) {
                 connection.sendMsg(((char) Commands.CD.getBt() + serverView.getSelectionModel().getSelectedItem()).getBytes());
                 connection.sendMsg(Commands.GET.getBt());
+            }
+        });
+
+        serverView.setCellFactory(param -> new ListCell<String>() {
+            private final ImageView imageView = new ImageView();
+            @Override
+            public void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    imageView.setFitHeight(15);
+                    imageView.setFitWidth(15);
+                    if (name.equals("..")) {
+                        imageView.setImage(back);
+                    } else if (!name.contains(".")) {
+                        imageView.setImage(folder);
+                    } else if (name.matches(".*\\.docx$")) {
+                        imageView.setImage(doc);
+                    } else if (name.matches(".*\\.(png|jpg|jpeg|gif|tiff|psd)$")) {
+                        imageView.setImage(img);
+                    } else if (name.matches(".*\\.pdf$")) {
+                        imageView.setImage(pdf);
+                    } else if (name.matches(".*\\.txt$")) {
+                        imageView.setImage(txt);
+                    } else if (name.matches(".*\\.(zip|rar)$")) {
+                        imageView.setImage(zip);
+                    } else {
+                        imageView.setImage(unknown);
+                    }
+                    setText(name);
+                    setGraphic(imageView);
+                }
+            }
+        });
+
+        clientView.setCellFactory(param -> new ListCell<String>() {
+            private final ImageView imageView = new ImageView();
+            @Override
+            public void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    imageView.setFitHeight(15);
+                    imageView.setFitWidth(15);
+                    if (name.equals("..")) {
+                        imageView.setImage(back);
+                    } else if (!name.contains(".")) {
+                        imageView.setImage(folder);
+                    } else if (name.matches(".*\\.docx$")) {
+                        imageView.setImage(doc);
+                    } else if (name.matches(".*\\.(png|jpg|jpeg|gif|tiff|psd)$")) {
+                        imageView.setImage(img);
+                    } else if (name.matches(".*\\.pdf$")) {
+                        imageView.setImage(pdf);
+                    } else if (name.matches(".*\\.txt$")) {
+                        imageView.setImage(txt);
+                    } else if (name.matches(".*\\.(zip|rar)$")) {
+                        imageView.setImage(zip);
+                    } else {
+                        imageView.setImage(unknown);
+                    }
+                    setText(name);
+                    setGraphic(imageView);
+                }
             }
         });
     }

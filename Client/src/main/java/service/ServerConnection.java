@@ -79,6 +79,8 @@ public class ServerConnection {
 
         if (length != -1) {
             handleCommand(command, b);
+            System.out.println(command);
+            System.out.println(Arrays.toString(b));
         }
     }
 
@@ -108,6 +110,8 @@ public class ServerConnection {
             case TOUCH:
             case REMOVE:
             case LOG:
+            case CD:
+                System.out.println("LOG");
                 clientCommands.log(Convert.bytesToStr(input));
                 break;
             case GET:

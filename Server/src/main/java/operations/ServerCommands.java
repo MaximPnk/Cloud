@@ -10,18 +10,24 @@ import java.util.List;
 
 public class ServerCommands {
 
-    private String username = ""; //TODO изменить
-    private String rootPath = "Server/Storage/" + username;
+    private String username;
+    private String rootPath;
 
     public ServerCommands() {
     }
 
     public ServerCommands(String username) {
         this.username = username;
+        this.rootPath = "Server/Storage/" + username;
+
+        File file = new File(rootPath);
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 
     public String cd(String selectedItem) {
-        if (selectedItem.equals("..") && !rootPath.equals("Server/Storage" + username)) {
+        if (selectedItem.equals("..") && !rootPath.equals("Server/Storage/" + username)) {
             rootPath = rootPath.substring(0, rootPath.lastIndexOf("/"));
             return "Path changed successfully";
         } else if (!selectedItem.contains(".")) {
@@ -37,7 +43,7 @@ public class ServerCommands {
         if (files == null) {
             return "";
         }
-        return rootPath + " " + String.join(" ", files);
+        return rootPath.substring(rootPath.indexOf(username)) + " " + String.join(" ", files);
     }
 
     public boolean mkdir(String dirName) {
@@ -45,11 +51,10 @@ public class ServerCommands {
     }
 
     public boolean rm(String name) {
-        System.out.println(rootPath + "/" + name);
         return new File(rootPath + "/" + name).delete();
     }
 
-    public boolean touch (String fileName) {
+    public boolean touch(String fileName) {
         try {
             return new File(rootPath + "/" + fileName).createNewFile();
         } catch (IOException e) {
@@ -103,5 +108,9 @@ public class ServerCommands {
 
     public String getRootPath() {
         return rootPath;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

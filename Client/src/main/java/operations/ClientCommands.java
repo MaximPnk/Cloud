@@ -4,12 +4,17 @@ import commands.Commands;
 import graphics.Window;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ListCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import service.Convert;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class ClientCommands {
@@ -40,22 +45,28 @@ public class ClientCommands {
         Window.getClientController().logArea.appendText(str + System.lineSeparator());
     }
 
-    public void serverFiles(String list) {
-        String[] files = list.split(" ");
+    public void serverFiles(String text) {
+        String[] files = text.split(" ");
+        String[] arr = Arrays.copyOfRange(files, 1, files.length);
+        ObservableList<String> list = FXCollections.observableArrayList();
+        list.add("..");
+        list.addAll(Arrays.stream(arr).sorted(Comparator.comparingInt(fl -> fl.indexOf("."))).toArray(String[]::new));
         Platform.runLater(() -> {
             Window.getClientController().serverPath.setText(files[0]);
-            files[0] = "..";
-            Window.getClientController().serverView.setItems(FXCollections.observableArrayList(files));
+            Window.getClientController().serverView.setItems(FXCollections.observableArrayList(list));
         });
     }
 
     public void clientFiles() {
         String[] files = new File(rootPath).list();
         assert files != null;
-        String[] arr = (".. " + String.join(" ", files)).split(" ");
+        String[] arr = (String.join(" ", files)).split(" ");
+        ObservableList<String> list = FXCollections.observableArrayList();
+        list.add("..");
+        list.addAll(Arrays.stream(arr).sorted(Comparator.comparingInt(fl -> fl.indexOf("."))).toArray(String[]::new));
         Platform.runLater(() -> {
             Window.getClientController().clientPath.setText(rootPath);
-            Window.getClientController().clientView.setItems(FXCollections.observableArrayList(arr));
+            Window.getClientController().clientView.setItems(FXCollections.observableArrayList(list));
         });
     }
 
@@ -72,8 +83,7 @@ public class ClientCommands {
                             "• Get: click for update file lists [Client/Server]" + System.lineSeparator() + System.lineSeparator() +
                             "• Make directory: select server path and click mkdir button [Server]" + System.lineSeparator() + System.lineSeparator() +
                             "• Create file: select server path and click touch button [Server]" + System.lineSeparator() + System.lineSeparator() +
-                            "• Remove: select file in the server window and click remove button [Server]" + System.lineSeparator() + System.lineSeparator() + System.lineSeparator() + System.lineSeparator() +
-                            "Author Pankov Maxim © 2020");
+                            "• Remove: select file in the server window and click remove button [Server]");
             alert.showAndWait();
         });
     }

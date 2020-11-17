@@ -2,10 +2,11 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox alignment="center" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="graphics.ClientController">
+<VBox alignment="center" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="graphics.ClientController">
 
-    <HBox VBox.vgrow="ALWAYS" minHeight="300">
+    <HBox minHeight="300" VBox.vgrow="ALWAYS">
         <VBox fx:id="clientSide" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
             <TextField fx:id="clientPath" editable="false" />
             <ListView fx:id="clientView" />
@@ -18,19 +19,23 @@
 
     <VBox>
         <HBox alignment="CENTER">
-            <Button prefWidth="250.0" fx:id="upload" text="Upload" />
-            <Button prefWidth="250.0" fx:id="download" text="Download" />
-            <Button prefWidth="250.0" fx:id="get" text="Update list" />
+            <Button fx:id="upload" prefWidth="250.0" text="Upload" />
+            <Button fx:id="download" prefWidth="250.0" text="Download" />
+            <Button fx:id="get" prefWidth="250.0" text="Update list" />
         </HBox>
         <HBox alignment="CENTER">
-            <Button prefWidth="250.0" fx:id="mkdir" text="New directory" />
-            <Button prefWidth="250.0" fx:id="touch" text="New file" />
-            <Button prefWidth="250.0" fx:id="remove" text="Remove" />
+            <Button fx:id="mkdir" prefWidth="250.0" text="New directory" />
+            <Button fx:id="touch" prefWidth="250.0" text="New file" />
+            <Button fx:id="remove" prefWidth="250.0" text="Remove" />
         </HBox>
         <HBox alignment="CENTER">
-            <Button prefWidth="750.0" fx:id="help" text="Help" />
+            <Button fx:id="help" prefWidth="750.0" text="Help" />
         </HBox>
     </VBox>
 
-    <TextArea fx:id="logArea" editable="false" VBox.vgrow="ALWAYS" />
+    <TextArea fx:id="logArea" editable="false" prefHeight="214.0" prefWidth="750.0" VBox.vgrow="ALWAYS">
+      <font>
+         <Font name="Arial Bold" size="18.0" />
+      </font>
+    </TextArea>
 </VBox>

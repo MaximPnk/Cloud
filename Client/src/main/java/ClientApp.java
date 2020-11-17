@@ -5,3 +5,10 @@ public class ClientApp {
         Window.main(args);
     }
 }
+
+//TODO auth, reg расширить
+//TODO пароли *
+//TODO по ентеру как по клику
+//TODO расширить файловый путь
+//TODO фон
+//TODO ошибка при аплоаде/даунлоаде

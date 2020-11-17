@@ -5,17 +5,16 @@ import db.DBCommands;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import service.Convert;
 import operations.ServerCommands;
+import service.Convert;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public class MainHandler extends ChannelInboundHandlerAdapter {
 
     private ByteBuf buffer;
 
-    private final ServerCommands serverCommands = new ServerCommands();
+    private ServerCommands serverCommands;
     private final DBCommands db = new DBCommands();
 
     @Override
@@ -62,7 +61,12 @@ public class MainHandler extends ChannelInboundHandlerAdapter {
             case AUTH:
                 String loginAuth = Convert.bytesToStr(msg).split(" ")[0];
                 String passAuth = Convert.bytesToStr(msg).split(" ")[1];
-                sendMsg(ctx, ((char) command + (db.auth(loginAuth, passAuth) ? "SUCCESS" : "FAIL")).getBytes());
+                if (db.auth(loginAuth, passAuth)) {
+                    serverCommands = new ServerCommands(loginAuth);
+                    sendMsg(ctx, ((char) command + "SUCCESS").getBytes());
+                } else {
+                    sendMsg(ctx, ((char) command + "FAIL").getBytes());
+                }
                 break;
             case DOWNLOAD:
                 serverCommands.download(Convert.bytesToStr(msg)).forEach(m -> sendMsg(ctx, m));
