@@ -1,17 +1,14 @@
 package service;
 
-import commands.Commands;
 import graphics.Window;
 import javafx.application.Platform;
 import operations.ClientCommands;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class ServerConnection {
 

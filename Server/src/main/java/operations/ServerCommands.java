@@ -1,6 +1,6 @@
 package operations;
 
-import commands.Commands;
+import service.Commands;
 import service.Convert;
 
 import java.io.*;

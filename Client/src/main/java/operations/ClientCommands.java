@@ -1,6 +1,6 @@
 package operations;
 
-import commands.Commands;
+import service.Commands;
 import graphics.Window;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;

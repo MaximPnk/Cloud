@@ -1,6 +1,6 @@
 package graphics;
 
-import commands.Commands;
+import service.Commands;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

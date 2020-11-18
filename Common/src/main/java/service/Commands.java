@@ -1,4 +1,4 @@
-package commands;
+package service;
 
 public enum Commands {
     UPLOAD ((byte) 10),
