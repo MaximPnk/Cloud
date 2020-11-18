@@ -67,7 +67,6 @@ public class ServerCommands {
         try {
             String fileName = Convert.bytesToStr(Arrays.copyOfRange(msg, 1, msg[0] + 1));
             File file = new File(rootPath + "/" + fileName);
-            System.out.println(rootPath + "/" + fileName);
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -98,7 +97,6 @@ public class ServerCommands {
                 System.arraycopy(beginArray, 0, send, 0, beginArray.length);
                 System.arraycopy(data, i, send, start, Math.min(freeSpace, size - i));
                 list.add(send);
-                System.out.println(Convert.bytesToStr(send));
             }
             uploadDis.close();
         } catch (IOException e) {

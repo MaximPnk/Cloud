@@ -77,7 +77,6 @@ public class ServerConnection {
 
         if (length != -1) {
             handleCommand(command, b);
-            System.out.println(Convert.bytesToStr(b));
         }
     }
 
